@@ -122,6 +122,8 @@ Przy pierwszym uruchomieniu aplikacja automatycznie:
    - Hasło: `admin`
 3. **Kliknij "Zaloguj"**
 
+![image](https://github.com/user-attachments/assets/4aea1c23-2858-4596-9c72-c73a29539416)
+
 ### Parkowanie pojazdu
 
 1. **Na głównym ekranie wybierz typ pojazdu** (Motocykl/Samochód/Autobus)
@@ -131,20 +133,25 @@ Przy pierwszym uruchomieniu aplikacja automatycznie:
 
 **Uwaga:** Jeśli pojazd nie istnieje w systemie, zostanie automatycznie dodany.
 
+![image](https://github.com/user-attachments/assets/86fba802-603f-4e69-94d0-d6d75878e567)
+
 ### Używanie istniejącego pojazdu
 
 1. **Wybierz pojazd z listy "Wybierz istniejący pojazd"**
 2. **Pola zostaną automatycznie wypełnione**
 3. **Wybierz kolumnę i zaparkuj**
 
+![image](https://github.com/user-attachments/assets/95ed5122-d13c-46c4-a69b-e893d573dfed)
+
+![image](https://github.com/user-attachments/assets/2f1a1659-15f7-40e2-a50f-206b97e20529)
+
 ### Wyparkowanie pojazdu
 
 1. **Kliknij "Wyparkuj pojazd"**
 2. **Wybierz pojazd z listy zaparkowanych**
-3. **Sprawdź szczegóły pojazdu**
-4. **Kliknij "Wyparkuj"**
+3. **Kliknij "Wyparkuj"**
 
-**System automatycznie obliczy opłatę za parkowanie.**
+![image](https://github.com/user-attachments/assets/aade7746-a82b-4077-bae7-dc747780e384)
 
 ### Wyszukiwanie pojazdu
 
@@ -152,6 +159,8 @@ Przy pierwszym uruchomieniu aplikacja automatycznie:
 2. **Wprowadź numer rejestracyjny**
 3. **Kliknij "Wyszukaj" lub naciśnij Enter**
 4. **Sprawdź lokalizację pojazdu**
+
+![image](https://github.com/user-attachments/assets/2059d12b-a651-45a9-834f-d26b01ad358c)
 
 ### Zarządzanie pojazdami
 
@@ -171,6 +180,8 @@ Przy pierwszym uruchomieniu aplikacja automatycznie:
    - Kliknij "Usuń"
    - Potwierdź usunięcie
 
+![image](https://github.com/user-attachments/assets/e1c8fd95-9f29-4b78-ae57-20dbc2461159)
+
 **Uwaga:** Nie można usunąć pojazdu, który jest aktualnie zaparkowany.
 
 ### Podgląd stanu parkingu
@@ -179,6 +190,8 @@ Przy pierwszym uruchomieniu aplikacja automatycznie:
 - **Siatka parkingu** - zielone miejsca (wolne), czerwone (zajęte)
 - **Lista zaparkowanych pojazdów** - z numerami rejestracyjnymi i kolumnami
 - **Podpowiedzi** - najedź na miejsce aby zobaczyć szczegóły
+
+![image](https://github.com/user-attachments/assets/88a89fea-f200-42ff-a3cc-0fcfe882e134)
 
 **Legenda:**
 - 🟢 **Zielone** - miejsce wolne
@@ -233,10 +246,6 @@ Przy pierwszym uruchomieniu aplikacja automatycznie:
 ## 👥 Autorzy
 
 - **Gabriel Łasicki** (Gaabcio) - deweloper główny
-
-## 📄 Licencja
-
-Projekt edukacyjny - wszystkie prawa zastrzeżone.
 
 ---
 
