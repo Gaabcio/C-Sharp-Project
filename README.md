@@ -101,7 +101,7 @@ System Obsługi Parkingu to aplikacja desktopowa napisana w C# z wykorzystaniem 
    dotnet run
    ```
 
-### 4. Pierwszy uruch
+### 4. Pierwsze uruchomienie
 
 Przy pierwszym uruchomieniu aplikacja automatycznie:
 - Utworzy strukturę bazy danych
