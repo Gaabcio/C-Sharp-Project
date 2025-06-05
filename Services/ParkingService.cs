@@ -16,27 +16,28 @@ namespace ParkingManagementSystem.Services
             _context = context;
         }
 
-        // NEW METHOD 1: ParkVehicleAsync
-        public async Task<bool> ParkVehicleAsync(string licensePlate, string vehicleType, int column, int userId)
+
+        public async Task<bool> ParkVehicleAsync(string licensePlate, string vehicleType, int column, int userId) // Parkuje pojazd na podstawie numeru rejestracyjnego, typu pojazdu, kolumny i identyfikatora użytkownika
         {
             try
             {
-                // Check if vehicle already exists
+                // sprawdzenie, czy pojazd o podanym numerze rejestracyjnym już istnieje
                 var existingVehicle = await _context.Vehicles
                     .FirstOrDefaultAsync(v => v.LicensePlate == licensePlate);
 
                 Vehicle vehicle;
 
+                // jesli pojazd nie istnieje, tworzymy nowy pojazd
                 if (existingVehicle == null)
                 {
-                    // Get vehicle type
+                    // Sprawdzenie, czy typ pojazdu istnieje
                     var vType = await _context.VehicleTypes
                         .FirstOrDefaultAsync(vt => vt.Name == vehicleType);
 
                     if (vType == null)
                         return false;
 
-                    // Create new vehicle
+                    // Tworzenie nowego pojazdu
                     vehicle = new Vehicle
                     {
                         LicensePlate = licensePlate.ToUpper(),
@@ -51,33 +52,33 @@ namespace ParkingManagementSystem.Services
                 {
                     vehicle = existingVehicle;
 
-                    // Check if already parked
+                    // sprawdzenie, czy pojazd jest już zaparkowany
                     var activeReservation = await _context.ParkingReservations
                         .FirstOrDefaultAsync(pr => pr.VehicleId == vehicle.Id && pr.IsActive);
 
                     if (activeReservation != null)
-                        return false; // Already parked
+                        return false; // Pojazd jest już zaparkowany
                 }
 
-                // Get vehicle type details
+                // Zdobycie typu pojazdu
                 var vehicleTypeEntity = await _context.VehicleTypes
                     .FindAsync(vehicle.VehicleTypeId);
 
                 if (vehicleTypeEntity == null)
                     return false;
 
-                // Check if column is available
+                // Sprawdzenie, czy kolumna jest dostępna
                 if (!await IsColumnAvailableAsync(column, vehicleTypeEntity.Name))
                     return false;
 
-                // Get allowed rows for this vehicle type
+                // Sprawdzenie dostępnych miejsc parkingowych
                 var allowedRows = GetAllowedRows(vehicleTypeEntity.Name);
                 var availableSpace = await GetAvailableParkingSpaceAsync(allowedRows, column, vehicleTypeEntity.SpacesRequired);
 
                 if (availableSpace == null)
                     return false;
 
-                // Create parking reservation
+                // Tworzenie rezerwacji parkingowej
                 var reservation = new ParkingReservation
                 {
                     VehicleId = vehicle.Id,
@@ -89,7 +90,7 @@ namespace ParkingManagementSystem.Services
 
                 _context.ParkingReservations.Add(reservation);
 
-                // Mark spaces as occupied
+                // Oznaczanie miejsc jako zajętych
                 await MarkSpacesAsOccupied(allowedRows, column, vehicleTypeEntity.SpacesRequired);
 
                 await _context.SaveChangesAsync();
@@ -109,41 +110,42 @@ namespace ParkingManagementSystem.Services
             return await GetActiveReservationsAsync();
         }
 
-        // EXISTING METHODS (keep all your existing methods here)
-        public async Task<bool> AddVehicleAsync(Vehicle vehicle, int column)
+
+
+        public async Task<bool> AddVehicleAsync(Vehicle vehicle, int column) // dodaje pojazd do systemu
         {
             try
             {
-                // Check if vehicle already exists
+                // Sprawdzenie, czy pojazd już istnieje
                 var existingVehicle = await _context.Vehicles
                     .FirstOrDefaultAsync(v => v.LicensePlate == vehicle.LicensePlate);
 
                 if (existingVehicle != null)
                     return false;
 
-                // Get vehicle type
+                // Pobranie typu pojazdu
                 var vehicleType = await _context.VehicleTypes
                     .FindAsync(vehicle.VehicleTypeId);
 
                 if (vehicleType == null)
                     return false;
 
-                // Check if column is available
+                // Sprawdzenie, czy kolumna jest dostępna
                 if (!await IsColumnAvailableAsync(column, vehicleType.Name))
                     return false;
 
-                // Get allowed rows for this vehicle type
+                // Pobranie dozwolonych rzędów dla tego typu pojazdu
                 var allowedRows = GetAllowedRows(vehicleType.Name);
                 var availableSpace = await GetAvailableParkingSpaceAsync(allowedRows, column, vehicleType.SpacesRequired);
 
                 if (availableSpace == null)
                     return false;
 
-                // Create vehicle
+                // Utworzenie pojazdu
                 _context.Vehicles.Add(vehicle);
                 await _context.SaveChangesAsync();
 
-                // Create parking reservation
+                // Utworzenie rezerwacji parkingowej
                 var reservation = new ParkingReservation
                 {
                     VehicleId = vehicle.Id,
@@ -155,7 +157,7 @@ namespace ParkingManagementSystem.Services
 
                 _context.ParkingReservations.Add(reservation);
 
-                // Mark spaces as occupied
+                // Oznaczenie miejsc jako zajętych
                 await MarkSpacesAsOccupied(allowedRows, column, vehicleType.SpacesRequired);
 
                 await _context.SaveChangesAsync();
@@ -167,32 +169,36 @@ namespace ParkingManagementSystem.Services
             }
         }
 
-        public async Task<bool> RemoveVehicleAsync(string licensePlate)
+
+
+        public async Task<bool> RemoveVehicleAsync(string licensePlate) // Usuwa pojazd z systemu na podstawie numeru rejestracyjnego
         {
             try
             {
+                // Sprawdzenie, czy pojazd istnieje
                 var vehicle = await _context.Vehicles
                     .Include(v => v.VehicleType)
                     .Include(v => v.ParkingReservations)
                         .ThenInclude(pr => pr.ParkingSpace)
                     .FirstOrDefaultAsync(v => v.LicensePlate == licensePlate);
 
+                // Jeśli pojazd nie istnieje, zwróć false
                 if (vehicle == null)
                     return false;
 
-                var activeReservation = vehicle.ParkingReservations
+                var activeReservation = vehicle.ParkingReservations // Sprawdzenie aktywnej rezerwacji
                     .FirstOrDefault(pr => pr.IsActive);
 
                 if (activeReservation != null)
                 {
-                    // Free up parking spaces
+                    // Zwolnienie miejsc parkingowych
                     var allowedRows = GetAllowedRows(vehicle.VehicleType.Name);
-                    await MarkSpacesAsAvailable(allowedRows, activeReservation.ParkingSpace.Column, vehicle.VehicleType.SpacesRequired);
+                    await MarkSpacesAsAvailable(allowedRows, activeReservation.ParkingSpace.Column, vehicle.VehicleType.SpacesRequired); // Oznaczenie miejsc jako dostępnych
 
-                    _context.ParkingReservations.Remove(activeReservation);
+                    _context.ParkingReservations.Remove(activeReservation); // Usunięcie aktywnej rezerwacji
                 }
 
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); // Zapisanie zmian w bazie danych
                 return true;
             }
             catch
@@ -201,7 +207,7 @@ namespace ParkingManagementSystem.Services
             }
         }
 
-        public async Task<Vehicle?> FindVehicleAsync(string licensePlate)
+        public async Task<Vehicle?> FindVehicleAsync(string licensePlate) // Znajduje pojazd na podstawie numeru rejestracyjnego
         {
             return await _context.Vehicles
                 .Include(v => v.VehicleType)
@@ -211,14 +217,14 @@ namespace ParkingManagementSystem.Services
                 .FirstOrDefaultAsync(v => v.LicensePlate == licensePlate);
         }
 
-        public async Task<string> SearchVehicleAsync(string licensePlate)
+        public async Task<string> SearchVehicleAsync(string licensePlate) // Wyszukuje pojazd na podstawie numeru rejestracyjnego i zwraca informacje o nim
         {
             var vehicle = await FindVehicleAsync(licensePlate);
 
             if (vehicle == null)
                 return "Pojazd o podanym numerze rejestracyjnym nie został znaleziony.";
 
-            var activeReservation = vehicle.ParkingReservations.FirstOrDefault(pr => pr.IsActive);
+            var activeReservation = vehicle.ParkingReservations.FirstOrDefault(pr => pr.IsActive);  // Sprawdzenie aktywnej rezerwacji
 
             if (activeReservation == null)
                 return "Pojazd nie jest obecnie zaparkowany.";
@@ -232,7 +238,7 @@ namespace ParkingManagementSystem.Services
                    $"⌚ Czas parkowania: {durationText}";
         }
 
-        public async Task<List<string>> GetAllLicensePlatesAsync()
+        public async Task<List<string>> GetAllLicensePlatesAsync()  // Pobiera wszystkie numery rejestracyjne pojazdów, które mają aktywne rezerwacje parkingowe
         {
             return await _context.Vehicles
                 .Where(v => v.ParkingReservations.Any(pr => pr.IsActive))
@@ -240,45 +246,43 @@ namespace ParkingManagementSystem.Services
                 .ToListAsync();
         }
 
-        public async Task<List<int>> GetAvailableColumnsAsync(string vehicleType)
+        public async Task<List<int>> GetAvailableColumnsAsync(string vehicleType) // Pobiera dostępne kolumny dla danego typu pojazdu
         {
-            var occupiedColumns = await GetOccupiedColumnsAsync(vehicleType);
+            var occupiedColumns = await GetOccupiedColumnsAsync(vehicleType);     // Pobranie zajętych kolumn dla danego typu pojazdu
             var availableColumns = new List<int>();
 
             for (int col = 0; col < MaxColumns; col++)
             {
-                if (!occupiedColumns.Contains(col))
+                if (!occupiedColumns.Contains(col)) // Sprawdzenie, czy kolumna nie jest zajęta
                 {
-                    availableColumns.Add(col);
+                    availableColumns.Add(col);      // Dodanie dostępnej kolumny do listy
                 }
             }
-
             return availableColumns;
         }
 
-        public async Task<bool> IsColumnAvailableAsync(int column, string vehicleType)
+        public async Task<bool> IsColumnAvailableAsync(int column, string vehicleType) // Sprawdza, czy kolumna jest dostępna dla danego typu pojazdu
         {
-            var occupiedColumns = await GetOccupiedColumnsAsync(vehicleType);
-            return !occupiedColumns.Contains(column);
+            var occupiedColumns = await GetOccupiedColumnsAsync(vehicleType); // Pobranie zajętych kolumn dla danego typu pojazdu
+            return !occupiedColumns.Contains(column); //
         }
 
-        public async Task<int> GetAvailableParkingSpacesAsync()
-        {
-            var totalSpaces = MaxRows * MaxColumns;
-            var occupiedSpaces = await _context.ParkingSpaces
-                .CountAsync(ps => ps.IsOccupied);
+        // public async Task<int> GetAvailableParkingSpacesAsync()  // Zwraca liczbę dostępnych miejsc parkingowych
+        // {
+        //     var totalSpaces = MaxRows * MaxColumns;
+        //     var occupiedSpaces = await _context.ParkingSpaces
+        //         .CountAsync(ps => ps.IsOccupied);
 
-            return totalSpaces - occupiedSpaces;
-        }
+        //     return totalSpaces - occupiedSpaces;
+        // }
 
-        public async Task<int> GetOccupiedParkingSpacesAsync()
-        {
-            return await _context.ParkingSpaces
-                .CountAsync(ps => ps.IsOccupied);
-        }
+        // public async Task<int> GetOccupiedParkingSpacesAsync()
+        // {
+        //     return await _context.ParkingSpaces
+        //         .CountAsync(ps => ps.IsOccupied);
+        // }
 
-        //Zastosowano niwelowanie problemu N+1 zapytań poprzez użycie Include i AsNoTracking
-        public async Task<List<ParkingReservation>> GetActiveReservationsAsync()
+        public async Task<List<ParkingReservation>> GetActiveReservationsAsync()  // Pobiera listę aktywnych rezerwacji parkingowych
         {
             return await _context.ParkingReservations
                 .Include(pr => pr.Vehicle)
@@ -293,14 +297,14 @@ namespace ParkingManagementSystem.Services
                 .ToListAsync();
         }
 
-        public void DisplayParkingLayout(string vehicleType, int startRow, int rowCount)
-        {
-            // Implementation for console display - can be empty for WPF app
-            System.Console.WriteLine($"Parking layout for {vehicleType}");
-        }
+        // public void DisplayParkingLayout(string vehicleType, int startRow, int rowCount)  //
+        // {
+        //     // Implementation for console display - can be empty for WPF app
+        //     System.Console.WriteLine($"Parking layout for {vehicleType}");
+        // }
 
-        // PRIVATE HELPER METHODS
-        private async Task<List<int>> GetOccupiedColumnsAsync(string vehicleType)
+
+        private async Task<List<int>> GetOccupiedColumnsAsync(string vehicleType) // Pobiera listę zajętych kolumn dla danego typu pojazdu
         {
             var allowedRows = GetAllowedRows(vehicleType);
 
@@ -311,7 +315,7 @@ namespace ParkingManagementSystem.Services
                 .ToListAsync();
         }
 
-        private async Task<ParkingSpace?> GetAvailableParkingSpaceAsync(List<int> allowedRows, int column, int spacesRequired)
+        private async Task<ParkingSpace?> GetAvailableParkingSpaceAsync(List<int> allowedRows, int column, int spacesRequired) // Pobiera dostępne miejsce parkingowe w określonej kolumnie i rzędach
         {
             return await _context.ParkingSpaces
                 .FirstOrDefaultAsync(ps => allowedRows.Contains(ps.Row) &&
@@ -319,6 +323,7 @@ namespace ParkingManagementSystem.Services
                                          !ps.IsOccupied);
         }
 
+        // Metoda do oznaczania miejsc parkingowych jako zajętych
         private async Task MarkSpacesAsOccupied(List<int> allowedRows, int column, int spacesRequired)
         {
             var spacesToOccupy = await _context.ParkingSpaces
@@ -332,6 +337,7 @@ namespace ParkingManagementSystem.Services
             }
         }
 
+        // Metoda do oznaczania miejsc parkingowych jako dostępnych
         private async Task MarkSpacesAsAvailable(List<int> allowedRows, int column, int spacesRequired)
         {
             var spacesToFree = await _context.ParkingSpaces
@@ -345,6 +351,7 @@ namespace ParkingManagementSystem.Services
             }
         }
 
+        // Metoda do pobierania dozwolonych rzędów dla danego typu pojazdu 
         private static List<int> GetAllowedRows(string vehicleType)
         {
             return vehicleType.ToLower() switch

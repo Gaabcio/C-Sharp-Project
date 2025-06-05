@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -25,7 +24,7 @@ namespace ParkingManagementSystem.Models
 
         public bool IsActive { get; set; } = true;
 
-        // Navigation properties
+
         public virtual Vehicle Vehicle { get; set; } = null!;
         public virtual User User { get; set; } = null!;
         public virtual ParkingSpace ParkingSpace { get; set; } = null!;

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\GitHub\\test\\ParkingManagementSystem.csproj": {}
+    "C:\\GitHub\\C-Sharp-Project\\ParkingManagementSystem.csproj": {}
   },
   "projects": {
-    "C:\\GitHub\\test\\ParkingManagementSystem.csproj": {
+    "C:\\GitHub\\C-Sharp-Project\\ParkingManagementSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\GitHub\\test\\ParkingManagementSystem.csproj",
+        "projectUniqueName": "C:\\GitHub\\C-Sharp-Project\\ParkingManagementSystem.csproj",
         "projectName": "ParkingManagementSystem",
-        "projectPath": "C:\\GitHub\\test\\ParkingManagementSystem.csproj",
+        "projectPath": "C:\\GitHub\\C-Sharp-Project\\ParkingManagementSystem.csproj",
         "packagesPath": "C:\\Users\\ga521\\.nuget\\packages\\",
-        "outputPath": "C:\\GitHub\\test\\obj\\",
+        "outputPath": "C:\\GitHub\\C-Sharp-Project\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ga521\\AppData\\Roaming\\NuGet\\NuGet.Config",

@@ -140,7 +140,7 @@ namespace ParkingManagementSystem.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/ParkingManagementSystem;component/views/managevehicleswindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/ParkingManagementSystem;V1.0.0.0;component/views/managevehicleswindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\ManageVehiclesWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

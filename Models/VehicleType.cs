@@ -20,7 +20,6 @@ namespace ParkingManagementSystem.Models
         [StringLength(20)]
         public string? AllowedRows { get; set; }
 
-        // Navigation properties
-        public virtual ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
+        public virtual ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>(); // 
     }
 }

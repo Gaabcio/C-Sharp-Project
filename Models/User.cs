@@ -1,19 +1,16 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ParkingManagementSystem.Models
 {
     public class User
     {
-        [Key]
+        [Key] //głowny klucz tabeli
         public int Id { get; set; }
 
         [Required]
         [StringLength(50)]
-        [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessage = "Username can only contain letters, numbers and underscores")]
-        public string Username { get; set; } = string.Empty;
+        [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessage = "Username can only contain letters, numbers and underscores")] // Walidacja dla nazwy użytkownika, aby zawierała tylko litery, cyfry i podkreślenia
+        public string Username { get; set; } = string.Empty;  //domyslna wartość to pusty string
 
         [Required]
         [StringLength(255)]
@@ -35,7 +32,7 @@ namespace ParkingManagementSystem.Models
         public DateTime? LastLoginAt { get; set; }
         public bool IsActive { get; set; } = true;
 
-        // Navigation properties
+
         public virtual ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
         public virtual ICollection<ParkingReservation> ParkingReservations { get; set; } = new List<ParkingReservation>();
     }
