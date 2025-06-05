@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -36,9 +34,9 @@ namespace ParkingManagementSystem.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        // Navigation properties
-        public virtual User User { get; set; } = null!;
-        public virtual VehicleType VehicleType { get; set; } = null!;
-        public virtual ICollection<ParkingReservation> ParkingReservations { get; set; } = new List<ParkingReservation>();
+
+        public virtual User User { get; set; } = null!;  // Właściwość nawigacyjna do właściciela pojazdu
+        public virtual VehicleType VehicleType { get; set; } = null!;  // Właściwość nawigacyjna do typu pojazdu
+        public virtual ICollection<ParkingReservation> ParkingReservations { get; set; } = new List<ParkingReservation>();  // Kolekcja rezerwacji parkingowych powiązanych z pojazdem
     }
 }

@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace ParkingManagementSystem.Models
@@ -19,7 +17,6 @@ namespace ParkingManagementSystem.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        // Navigation properties
         public virtual ICollection<ParkingReservation> ParkingReservations { get; set; } = new List<ParkingReservation>();
     }
 }

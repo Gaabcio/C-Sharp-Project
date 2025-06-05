@@ -5,23 +5,34 @@ using ParkingManagementSystem.Models;
 
 namespace ParkingManagementSystem.Data
 {
-    public class ParkingDbContext : DbContext
+    public class ParkingDbContext : DbContext // ParkingDbContext dziedziczy po DbContext (główna klasa do interakcji z bazą danych)
     {
         public ParkingDbContext(DbContextOptions<ParkingDbContext> options) : base(options)
         {
+
         }
 
+        //Kazda wartosc DbSet<T> reprezentuje tabele w bazie danych (pozwala na wykonywanie operacji CRUD)
+
+        //################################################################
         public DbSet<User> Users { get; set; }
         public DbSet<VehicleType> VehicleTypes { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<ParkingSpace> ParkingSpaces { get; set; }
         public DbSet<ParkingReservation> ParkingReservations { get; set; }
+        //################################################################
 
+
+
+        // Metoda OnModelCreating jest wywoływana podczas tworzenia modelu bazy danych
+        // Tutaj możemy skonfigurować encje, relacje i inne aspekty modelu
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(modelBuilder); // Wywołanie metody bazowej, aby zapewnić poprawne działanie dziedziczenia,
 
-            // User configuration
+            // Konfiguracja encji i relacji
+
+            // Konfiguracja User
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -31,14 +42,14 @@ namespace ParkingManagementSystem.Data
                 entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(255);
             });
 
-            // VehicleType configuration
+            // konfiguracja VehicleType
             modelBuilder.Entity<VehicleType>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(50);
             });
 
-            // Vehicle configuration
+            // konfiguracja Vehicle
             modelBuilder.Entity<Vehicle>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -48,15 +59,15 @@ namespace ParkingManagementSystem.Data
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Vehicles)
                     .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Cascade);          // Usunięcie pojazdu usuwa również wszystkie jego rezerwacje
 
                 entity.HasOne(d => d.VehicleType)
                     .WithMany(p => p.Vehicles)
                     .HasForeignKey(d => d.VehicleTypeId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.Restrict);         // Usunięcie typu pojazdu nie usuwa pojazdów jeśli są znim powiązane
             });
 
-            // ParkingSpace configuration
+            // konfiguracja ParkingSpace
             modelBuilder.Entity<ParkingSpace>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -65,7 +76,7 @@ namespace ParkingManagementSystem.Data
                 entity.Property(e => e.Column).IsRequired();
             });
 
-            // ParkingReservation configuration
+            // konfiguracja ParkingReservation
             modelBuilder.Entity<ParkingReservation>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -73,17 +84,17 @@ namespace ParkingManagementSystem.Data
                 entity.HasOne(d => d.Vehicle)
                     .WithMany(p => p.ParkingReservations)
                     .HasForeignKey(d => d.VehicleId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Cascade);        // Usunięcie pojazdu usuwa również wszystkie jego rezerwacje
 
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.ParkingReservations)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                // entity.HasOne(d => d.User)
+                //     .WithMany(p => p.ParkingReservations)
+                //     .HasForeignKey(d => d.UserId)
+                //     .OnDelete(DeleteBehavior.Restrict);     
 
                 entity.HasOne(d => d.ParkingSpace)
                     .WithMany(p => p.ParkingReservations)
                     .HasForeignKey(d => d.ParkingSpaceId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Cascade);      // Usunięcie miejsca parkingowego usuwa również wszystkie jego rezerwacje
             });
 
             // Seed data
@@ -99,14 +110,14 @@ namespace ParkingManagementSystem.Data
                 new VehicleType { Id = 3, Name = "Autobus", Description = "Pojazd wieloosobowy", SpacesRequired = 4, AllowedRows = "3,4,5,6"}
             );
 
-            // Seed for example Vehicles
+            // Seed dla przykladowych pojazdow
             modelBuilder.Entity<Vehicle>().HasData(
                 new Vehicle { Id = 1, LicensePlate = "ABC123", UserId = 1, VehicleTypeId = 2, Brand = "Toyota", Model = "Corolla", Color = "Czerwony", Year = 2020 },
                 new Vehicle { Id = 2, LicensePlate = "XYZ789", UserId = 1, VehicleTypeId = 1, Brand = "Honda", Model = "CB500F", Color = "Czarny", Year = 2019 },
                 new Vehicle { Id = 3, LicensePlate = "RST321", UserId = 1, VehicleTypeId = 3, Brand = "Mercedes", Model = "Extremum", Color = "Niebieski", Year = 2005 }
             );
 
-            // Seed default admin user
+            // Seed dla administratora
             modelBuilder.Entity<User>().HasData(
                 new User
                 {
@@ -119,7 +130,7 @@ namespace ParkingManagementSystem.Data
                 }
             );
 
-            // Seed parking spaces
+            // Seed miejsc parkingowych
             var parkingSpaces = new List<ParkingSpace>();
             int id = 1;
             for (int row = 0; row < 7; row++)

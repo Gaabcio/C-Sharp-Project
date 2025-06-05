@@ -13,31 +13,30 @@ namespace ParkingManagementSystem.Services
             _context = context;
         }
 
-        //Dokonano optymalizacji poprzez dodanie Include dla VehicleType i User, aby uniknπÊ N+1 problemu
-        public async Task<List<Vehicle>> GetUserVehiclesAsync(int userId)
-        {
-            return await _context.Vehicles
-                .Include(v => v.VehicleType)
-                .Include(v => v.User)                 
-                .Where(v => v.UserId == userId)
-                .OrderBy(v => v.LicensePlate)
-                .AsNoTracking()                       
-                .ToListAsync();
-        }
-
-        public async Task<List<VehicleType>> GetAllVehicleTypesAsync()
+        
+public async Task<List<Vehicle>> GetUserVehiclesAsync(int userId) // zwraca listƒô pojazd√≥w u≈ºytkownika (wyswietlanie pojazd√≥w w panelu u≈ºytkownika, lista wyboru pojazdu przy parkowaniu)
+{
+        return await _context.Vehicles
+            .Include(v => v.VehicleType)    // Eager loading - typ pojazdu
+            .Include(v => v.User)           // Eager loading - w≈Ça≈õciciel
+            .Where(v => v.UserId == userId) // Filtrowanie po u≈ºytkowniku
+            .OrderBy(v => v.LicensePlate)   // Sortowanie alfabetyczne
+            .AsNoTracking()                 // Bez ≈õledzenia zmian = szybciej
+            .ToListAsync();
+}
+        public async Task<List<VehicleType>> GetAllVehicleTypesAsync()  // zwraca listƒô wszystkich typ√≥w pojazd√≥w (Dropdown/ComboBox przy dodawaniu pojazdu, Wyb√≥r typu w formularzach)
         {
             return await _context.VehicleTypes
                 .OrderBy(vt => vt.Name)
                 .ToListAsync();
         }
 
-        public async Task<bool> CreateVehicleAsync(Vehicle vehicle)
+        public async Task<bool> CreateVehicleAsync(Vehicle vehicle)  // tworzy nowy pojazd, zwraca true je≈õli sukces
         {
             try
             {
                 vehicle.CreatedAt = DateTime.Now;
-                vehicle.LicensePlate = vehicle.LicensePlate.ToUpper();
+                vehicle.LicensePlate = vehicle.LicensePlate.ToUpper(); // Upewniamy siƒô, ≈ºe numer rejestracyjny jest zapisany wielkimi literami
                 
                 _context.Vehicles.Add(vehicle);
                 await _context.SaveChangesAsync();
@@ -49,21 +48,21 @@ namespace ParkingManagementSystem.Services
             }
         }
 
-        public async Task<bool> UpdateVehicleAsync(Vehicle vehicleDataFromForm) 
+        public async Task<bool> UpdateVehicleAsync(Vehicle vehicleDataFromForm) // aktualizuje pojazd, zwraca true je≈õli sukces
         {
             try
             {
-                // 1. Znajdü istniejπcπ, úledzonπ encjÍ w bazie danych
+                
                 var vehicleToUpdate = await _context.Vehicles.FindAsync(vehicleDataFromForm.Id);
 
                 if (vehicleToUpdate == null)
                 {
-                    // Pojazd o danym ID nie istnieje w bazie, to b≥πd
+                    
                     System.Diagnostics.Debug.WriteLine($"Nie znaleziono pojazdu o ID: {vehicleDataFromForm.Id} do aktualizacji.");
                     return false;
                 }
 
-                // 2. Zaktualizuj w≥aúciwoúci úledzonej encji danymi z formularza
+                
                 vehicleToUpdate.LicensePlate = vehicleDataFromForm.LicensePlate.ToUpper();
                 vehicleToUpdate.VehicleTypeId = vehicleDataFromForm.VehicleTypeId;
                 vehicleToUpdate.Brand = vehicleDataFromForm.Brand;
@@ -77,13 +76,13 @@ namespace ParkingManagementSystem.Services
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"B≥πd podczas UpdateVehicleAsync: {ex.ToString()}");
+                System.Diagnostics.Debug.WriteLine($"Blad podczas UpdateVehicleAsync: {ex.ToString()}");
                 return false;
             }
         }
 
 
-        public async Task<bool> DeleteVehicleAsync(int vehicleId)
+        public async Task<bool> DeleteVehicleAsync(int vehicleId)  // usuwa pojazd, zwraca true je≈õli sukces
         {
             try
             {
@@ -102,7 +101,7 @@ namespace ParkingManagementSystem.Services
             }
         }
 
-        public async Task<Vehicle?> GetVehicleByIdAsync(int vehicleId)
+        public async Task<Vehicle?> GetVehicleByIdAsync(int vehicleId)  // zwraca pojazd po ID, mo≈ºe byƒá null je≈õli nie znaleziono (Wy≈õwietlanie szczeg√≥≈Ç√≥w pojazdu, Edycja pojazdu (pobieranie aktualnych danych))
         {
             return await _context.Vehicles
                 .Include(v => v.VehicleType)
@@ -110,7 +109,7 @@ namespace ParkingManagementSystem.Services
                 .FirstOrDefaultAsync(v => v.Id == vehicleId);
         }
 
-        public async Task<bool> IsLicensePlateUniqueAsync(string licensePlate, int? excludeVehicleId = null)
+        public async Task<bool> IsLicensePlateUniqueAsync(string licensePlate, int? excludeVehicleId = null) // sprawdza, czy numer rejestracyjny jest unikalny, opcjonalnie z wykluczeniem pojazdu o podanym identyfikatorze
         {
             var query = _context.Vehicles.Where(v => v.LicensePlate == licensePlate.ToUpper());
             
