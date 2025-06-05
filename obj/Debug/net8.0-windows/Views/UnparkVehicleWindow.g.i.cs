@@ -84,7 +84,7 @@ namespace ParkingManagementSystem.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/ParkingManagementSystem;component/views/unparkvehiclewindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/ParkingManagementSystem;V1.0.0.0;component/views/unparkvehiclewindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\UnparkVehicleWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);
