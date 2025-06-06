@@ -9,8 +9,7 @@ namespace ParkingManagementSystem.Models
 
         [Required]
         [StringLength(50)]
-        [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessage = "Username can only contain letters, numbers and underscores")] // Walidacja dla nazwy użytkownika, aby zawierała tylko litery, cyfry i podkreślenia
-        public string Username { get; set; } = string.Empty;  //domyslna wartość to pusty string
+        public string Username { get; set; } = string.Empty; 
 
         [Required]
         [StringLength(255)]
@@ -21,11 +20,9 @@ namespace ParkingManagementSystem.Models
         public string? Email { get; set; }
 
         [StringLength(50)]
-        [RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "First name can only contain letters and spaces")]
         public string? FirstName { get; set; }
 
         [StringLength(50)]
-        [RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "Last name can only contain letters and spaces")]
         public string? LastName { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;

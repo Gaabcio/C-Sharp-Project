@@ -112,7 +112,7 @@ namespace ParkingManagementSystem.Services
 
 
 
-        public async Task<bool> AddVehicleAsync(Vehicle vehicle, int column) // dodaje pojazd do systemu
+        public async Task<bool> AddVehicleAsync(Vehicle vehicle, int column) // Dodaje pojazd do systemu 
         {
             try
             {
@@ -267,20 +267,6 @@ namespace ParkingManagementSystem.Services
             return !occupiedColumns.Contains(column); //
         }
 
-        // public async Task<int> GetAvailableParkingSpacesAsync()  // Zwraca liczbę dostępnych miejsc parkingowych
-        // {
-        //     var totalSpaces = MaxRows * MaxColumns;
-        //     var occupiedSpaces = await _context.ParkingSpaces
-        //         .CountAsync(ps => ps.IsOccupied);
-
-        //     return totalSpaces - occupiedSpaces;
-        // }
-
-        // public async Task<int> GetOccupiedParkingSpacesAsync()
-        // {
-        //     return await _context.ParkingSpaces
-        //         .CountAsync(ps => ps.IsOccupied);
-        // }
 
         public async Task<List<ParkingReservation>> GetActiveReservationsAsync()  // Pobiera listę aktywnych rezerwacji parkingowych
         {
@@ -296,12 +282,6 @@ namespace ParkingManagementSystem.Services
                 .AsNoTracking()                       
                 .ToListAsync();
         }
-
-        // public void DisplayParkingLayout(string vehicleType, int startRow, int rowCount)  //
-        // {
-        //     // Implementation for console display - can be empty for WPF app
-        //     System.Console.WriteLine($"Parking layout for {vehicleType}");
-        // }
 
 
         private async Task<List<int>> GetOccupiedColumnsAsync(string vehicleType) // Pobiera listę zajętych kolumn dla danego typu pojazdu

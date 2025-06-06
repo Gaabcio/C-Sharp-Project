@@ -14,17 +14,17 @@ namespace ParkingManagementSystem.Views
     public partial class ManageVehiclesWindow : Window
     {
         private readonly IVehicleService _vehicleService;
-        private readonly IParkingService _parkingService; // Dodano IParkingService
+        private readonly IParkingService _parkingService; 
         private readonly VehicleValidator _vehicleValidator;
         private User? _currentUser;
         private Vehicle? _editingVehicle;
 
-        // Zaktualizowano konstruktor, aby przyjmowa³ IParkingService
+
         public ManageVehiclesWindow(IVehicleService vehicleService, IParkingService parkingService, VehicleValidator vehicleValidator)
         {
             InitializeComponent();
             _vehicleService = vehicleService;
-            _parkingService = parkingService; // Przypisano wstrzykniêty serwis
+            _parkingService = parkingService;
             _vehicleValidator = vehicleValidator;
 
             Loaded += ManageVehiclesWindow_Loaded;
@@ -42,7 +42,7 @@ namespace ParkingManagementSystem.Views
             ClearForm();
         }
 
-        private async Task LoadVehicleTypes()
+        private async Task LoadVehicleTypes() // £aduje dostêpne typy pojazdów do ComboBox
         {
             try
             {
@@ -58,7 +58,7 @@ namespace ParkingManagementSystem.Views
             }
         }
 
-        private async Task LoadUserVehicles()
+        private async Task LoadUserVehicles() // £aduje pojazdy u¿ytkownika do DataGrid
         {
             try
             {
@@ -73,7 +73,7 @@ namespace ParkingManagementSystem.Views
             }
         }
 
-        private void VehiclesDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void VehiclesDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) // Obs³uguje zmianê zaznaczenia w DataGrid
         {
             if (VehiclesDataGrid.SelectedItem is Vehicle selectedVehicle)
             {
@@ -81,7 +81,7 @@ namespace ParkingManagementSystem.Views
             }
         }
 
-        private void LoadVehicleToForm(Vehicle vehicle)
+        private void LoadVehicleToForm(Vehicle vehicle)  // Wczytuje dane pojazdu do formularza edycji
         {
             _editingVehicle = vehicle;
             FormTitleTextBlock.Text = "Edytuj pojazd";
@@ -159,7 +159,7 @@ namespace ParkingManagementSystem.Views
                     return;
                 }
 
-                // Create vehicle object
+                // Stwórz nowy obiekt Vehicle na podstawie danych z formularza
                 var vehicle = new Vehicle
                 {
                     Id = _editingVehicle?.Id ?? 0,
@@ -172,7 +172,7 @@ namespace ParkingManagementSystem.Views
                     Year = int.TryParse(YearTextBox.Text, out int year) ? year : null
                 };
 
-                // Validate
+                // Walidacja pojazdu
                 var validationResult = await _vehicleValidator.ValidateAsync(vehicle);
                 if (!validationResult.IsValid)
                 {
@@ -181,7 +181,7 @@ namespace ParkingManagementSystem.Views
                     return;
                 }
 
-                // Save or update
+                // Zapis lub aktualizacja pojazdu
                 bool success;
                 if (_editingVehicle == null)
                 {
@@ -194,8 +194,8 @@ namespace ParkingManagementSystem.Views
                 }
                 else
                 {
-                    // Update existing vehicle
-                    vehicle.Id = _editingVehicle.Id; // Ensure the ID of the entity to be updated is correctly set
+                    // Aktualizacja istniej¹cego pojazdu
+                    vehicle.Id = _editingVehicle.Id;
                     success = await _vehicleService.UpdateVehicleAsync(vehicle);
                     if (success)
                     {

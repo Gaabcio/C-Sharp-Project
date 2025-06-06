@@ -101,14 +101,14 @@ namespace ParkingManagementSystem.Views
                     return;
                 }
 
-                // Check if vehicle exists or create new one
+                // Sprawdź, czy kolumna jest dostępna dla wybranego typu pojazdu
                 var vehicles = await _vehicleService.GetUserVehiclesAsync(_currentUser.Id);
                 var vehicle = vehicles.FirstOrDefault(v => v.LicensePlate == licensePlate);
 
                 if (vehicle == null)
                 {
 
-                    // Create new vehicle
+                    // Stwórz nowy pojazd, jeśli nie istnieje
                     vehicle = new Vehicle
                     {
                         LicensePlate = licensePlate,
@@ -151,14 +151,14 @@ namespace ParkingManagementSystem.Views
         }
 
 
-        // Refreshes the parking status by updating the parking grid, parked vehicles list, and user vehicles.
+        // Odświeża status parkingu, aktualizując siatkę parkingową i listę zaparkowanych pojazdów.
         private async Task RefreshParkingStatus()
         {
             try
             {
-                await UpdateParkingGrid(); // Update the parking grid with current reservations
-                await UpdateParkedVehiclesList(); // Update the list of parked vehicles
-                await LoadUserVehicles(); // Reload user vehicles to ensure the latest data is displayed
+                await UpdateParkingGrid(); // Zaktualizuj siatkę parkingową
+                await UpdateParkedVehiclesList(); // Zaktualizuj listę zaparkowanych pojazdów
+                await LoadUserVehicles(); // Załaduj pojazdy użytkownika
             }
             catch (Exception ex)
             {
@@ -166,20 +166,20 @@ namespace ParkingManagementSystem.Views
             }
         }
 
-        private async Task UpdateParkingGrid() // Updates the parking grid with the current parking layout and active reservations.
+        private async Task UpdateParkingGrid() // Aktualizuje siatkę parkingową, tworząc strukturę siatki i dodając zajęte/wolne miejsca parkingowe.
         {
             ParkingGrid.Children.Clear();
             ParkingGrid.RowDefinitions.Clear();
             ParkingGrid.ColumnDefinitions.Clear();
 
-            // Create grid structure (7 rows x 10 columns)
-            for (int i = 0; i < 8; i++) // +1 for header
+            // Stwórz wiersze i kolumny siatki parkingowej
+            for (int i = 0; i < 8; i++) // +1 dla nagłówka wierszy
                 ParkingGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(25) });
 
-            for (int i = 0; i < 11; i++) // +1 for row labels
+            for (int i = 0; i < 11; i++) // +1 dla nagłówka kolumn
                 ParkingGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(25) });
 
-            // Add column headers
+            // Dodaj nagłówek kolumn
             for (int colHeader = 0; colHeader < 10; colHeader++)
             {
                 var header = new TextBlock
@@ -199,7 +199,7 @@ namespace ParkingManagementSystem.Views
 
             for (int currentRow = 0; currentRow < 7; currentRow++)
             {
-                // Row label
+                // Dodaj etykietę wiersza
                 var rowLabel = new TextBlock
                 {
                     Text = GetRowLabel(currentRow),
@@ -219,12 +219,12 @@ namespace ParkingManagementSystem.Views
                     string toolTipText = "Wolne";
                     ParkingReservation? occupyingReservation = null;
 
-                    foreach (var reservation in activeReservations) // Check each active reservation to see if it occupies the current space
+                    foreach (var reservation in activeReservations) // Sprawdź, czy miejsce jest zajęte przez aktywną rezerwację
                     {
                         if (reservation.Vehicle != null && reservation.Vehicle.VehicleType != null &&
-                            reservation.ParkingSpace.Column == currentColumn && // Check if the reservation is for the current column
-                            currentRow >= reservation.ParkingSpace.Row &&    // Check if the current row is at or below the vehicle's starting row
-                            currentRow < (reservation.ParkingSpace.Row + reservation.Vehicle.VehicleType.SpacesRequired)) // Check if the current row is within the vehicle's vertical span
+                            reservation.ParkingSpace.Column == currentColumn && // Sprawdź, czy kolumna odpowiada rezerwacji
+                            currentRow >= reservation.ParkingSpace.Row &&    // Sprawdź, czy wiersz odpowiada rezerwacji
+                            currentRow < (reservation.ParkingSpace.Row + reservation.Vehicle.VehicleType.SpacesRequired)) // Spraw, czy wiersz jest w zakresie zajętych miejsc
                         {
                             isOccupied = true;
                             occupyingReservation = reservation;
@@ -265,14 +265,14 @@ namespace ParkingManagementSystem.Views
         {
             return row switch
             {
-                0 => "M",  // Motorcycles
+                0 => "M",  // Motorcycles (Motocykle)
                 1 or 2 => "S",  // Cars (Samochody)
                 3 or 4 or 5 or 6 => "A",  // Buses (Autobusy)
                 _ => "?"
             };
         }
 
-        // Updates the list of parked vehicles in the UI.
+        // Aktualizuje listę zaparkowanych pojazdów, pobierając aktywne rezerwacje i wyświetlając informacje o pojazdach.
         private async Task UpdateParkedVehiclesList()
         {
             var reservations = await _parkingService.GetAllActiveReservationsAsync();
@@ -283,7 +283,7 @@ namespace ParkingManagementSystem.Views
             ParkedVehiclesListBox.ItemsSource = items;
         }
 
-        // Loads the vehicles associated with the current user into the UserVehiclesComboBox.
+        // Ładuje pojazdy użytkownika do comboboxa, aby umożliwić wybór pojazdu do parkowania.
         private async Task LoadUserVehicles()
         {
             if (_currentUser == null) return;
@@ -292,7 +292,7 @@ namespace ParkingManagementSystem.Views
             {
                 var userVehicles = await _vehicleService.GetUserVehiclesAsync(_currentUser.Id);
                 UserVehiclesComboBox.ItemsSource = userVehicles;
-                UserVehiclesComboBox.DisplayMemberPath = "LicensePlate"; // Można dostosować, np. $"{LicensePlate} ({VehicleType.Name})" jeśli VehicleType jest załadowany
+                UserVehiclesComboBox.DisplayMemberPath = "LicensePlate";
                 UserVehiclesComboBox.SelectedValuePath = "Id";
             }
             catch (Exception ex)
@@ -301,7 +301,7 @@ namespace ParkingManagementSystem.Views
             }
         }
 
-        // Handles the selection change event for the UserVehiclesComboBox.
+        // Obsługuje zmianę wyboru pojazdu w comboboxie, aktualizując pola tekstowe z informacjami o pojeździe.
         private async void UserVehiclesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (UserVehiclesComboBox.SelectedItem is Vehicle selectedVehicle)
@@ -316,12 +316,12 @@ namespace ParkingManagementSystem.Views
             }
         }
 
-        private void VehicleTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void VehicleTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) 
         {
             LoadAvailableColumns(VehicleTypeComboBox.SelectedItem is VehicleType selectedType ? selectedType.Name : string.Empty).ConfigureAwait(false);
         }
 
-        // Opens a search window to find vehicles by license plate.
+        // Otwiera okno wyszukiwania pojazdów, umożliwiając użytkownikowi znalezienie pojazdu po numerze rejestracyjnym.
         private void SearchButton_Click(object sender, RoutedEventArgs e)
         {
             var searchWindow = _serviceProvider.GetRequiredService<SearchVehicleWindow>();
@@ -329,7 +329,7 @@ namespace ParkingManagementSystem.Views
             searchWindow.ShowDialog();
         }
 
-        // Opens a window to unpark a vehicle.
+        // Otwiera okno wyparkowania pojazdu, umożliwiając użytkownikowi wyparkowanie zaparkowanego pojazdu.
         private async void UnparkButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -353,7 +353,7 @@ namespace ParkingManagementSystem.Views
             }
         }
 
-        // Opens a window to manage vehicles, allowing the user to add, edit, or remove vehicles.
+        // Otwiera okno zarządzania pojazdami, umożliwiając użytkownikowi dodawanie, edytowanie i usuwanie pojazdów.
         private async void ManageVehiclesButton_Click(object sender, RoutedEventArgs e)
         {
             if (_currentUser == null)
@@ -362,7 +362,7 @@ namespace ParkingManagementSystem.Views
                 return;
             }
 
-            // Create a new scope for the ManageVehiclesWindow
+           
             using (var scope = _serviceProvider.CreateScope())
             {
                 var manageWindow = scope.ServiceProvider.GetRequiredService<ManageVehiclesWindow>();
@@ -387,6 +387,13 @@ namespace ParkingManagementSystem.Views
         {
             MessageTextBlock.Text = message;
             MessageTextBlock.Foreground = new SolidColorBrush(color);
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var id = 6;
+            _vehicleService.DeleteVehicleAsync(id);
+            ShowMessage($"Usunieto pojazd o id równym {id}", Colors.Wheat);
         }
     }
 }

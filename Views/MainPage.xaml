@@ -48,6 +48,7 @@
                            BorderThickness="0" FontSize="14"
                            Click="ParkButton_Click"/>
 
+
                     <!-- Vehicle Type Selection -->
                     <TextBlock Text="Wybierz istniejący pojazd:" Foreground="White" Margin="0,0,0,5"/>
                     <ComboBox x:Name="UserVehiclesComboBox" Height="35" FontSize="14" 
@@ -56,6 +57,14 @@
                     <!-- Error/Success Messages -->
                     <TextBlock x:Name="MessageTextBlock" TextWrapping="Wrap" 
                               Margin="0,10,0,0" FontWeight="Bold"/>
+                    
+                   <!-- 
+                    <Button Content="Testowy przycisk" Height="52" 
+                        Background="#FF28A745" Foreground="White" 
+                        BorderThickness="0" FontSize="14" Width="183" Click="Button_Click"/>
+                   -->
+
+
                 </StackPanel>
             </Border>
 

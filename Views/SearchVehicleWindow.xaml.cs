@@ -30,13 +30,13 @@ namespace ParkingManagementSystem.Views
                 await PerformSearch();
         }
 
-        private async Task PerformSearch()
+        private async Task PerformSearch() // Przeszukiwanie pojazdu
         {
             try
             {
-                string licensePlate = LicensePlateTextBox.Text.Trim().ToUpper();
-                
-                if (string.IsNullOrEmpty(licensePlate))
+                string licensePlate = LicensePlateTextBox.Text.Trim().ToUpper(); // Normalizacja do wielkich liter
+
+                if (string.IsNullOrEmpty(licensePlate)) //Jesli brak nr rejestracyjnego
                 {
                     ResultTextBlock.Text = "Podaj numer rejestracyjny";
                     return;

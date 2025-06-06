@@ -23,7 +23,7 @@ namespace ParkingManagementSystem.Views
             await LoadParkedVehicles();
         }
 
-        private async Task LoadParkedVehicles()
+        private async Task LoadParkedVehicles() // Załadowanie pojazdow zaparkowanych
         {
             try
             {
@@ -93,10 +93,8 @@ namespace ParkingManagementSystem.Views
                 {
                     ShowMessage($"Wyparkowano pojazd: {licensePlate}", Colors.Green);
 
-                    // Raise event to notify parent window
                     VehicleUnparked?.Invoke();
 
-                    // Wait a moment and close
                     await Task.Delay(1500);
                     Close();
                 }

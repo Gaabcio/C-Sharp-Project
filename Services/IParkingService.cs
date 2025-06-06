@@ -14,11 +14,7 @@ namespace ParkingManagementSystem.Services
         Task<List<string>> GetAllLicensePlatesAsync();  // zwraca listę wszystkich numerów rejestracyjnych pojazdów
         Task<List<int>> GetAvailableColumnsAsync(string vehicleType); // zwraca listę dostępnych kolumn dla określonego typu pojazdu
         Task<bool> IsColumnAvailableAsync(int column, string vehicleType); // sprawdza, czy określona kolumna jest dostępna dla danego typu pojazdu
-
-        // Task<int> GetAvailableParkingSpacesAsync(); // zwraca liczbę dostępnych miejsc parkingowych
-        // Task<int> GetOccupiedParkingSpacesAsync(); // zwraca liczbę zajętych miejsc parkingowych
         Task<List<ParkingReservation>> GetActiveReservationsAsync(); // zwraca listę aktywnych rezerwacji parkingowych
-        // void DisplayParkingLayout(string vehicleType, int startRow, int rowCount); // wyświetla układ parkingu dla określonego typu pojazdu, zaczynając od podanego wiersza i wyświetlając określoną liczbę wierszy
         Task<bool> ParkVehicleAsync(string licensePlate, string vehicleType, int column, int userId); // parkuje pojazd na podstawie numeru rejestracyjnego, typu pojazdu, kolumny i identyfikatora użytkownika, zwraca true jeśli sukces
         Task<List<ParkingReservation>> GetAllActiveReservationsAsync(); // zwraca listę wszystkich aktywnych rezerwacji parkingowych
     }

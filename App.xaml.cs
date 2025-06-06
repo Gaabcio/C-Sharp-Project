@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ParkingManagementSystem.Data;
+using ParkingManagementSystem.Models;
 using ParkingManagementSystem.Services;
 using ParkingManagementSystem.Validators;
 using ParkingManagementSystem.Views;
@@ -15,55 +16,80 @@ namespace ParkingManagementSystem
         public static IServiceProvider? ServiceProvider { get; private set; }
         public static IConfiguration? Configuration { get; private set; }
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
-            base.OnStartup(e);
-
-            // Build configuration
+            // Ładowanie konfiguracji z pliku appsettings.json
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
             Configuration = builder.Build();
 
-            // Configure services
-            var services = new ServiceCollection();
-            ConfigureServices(services);
-            ServiceProvider = services.BuildServiceProvider();
+            // Konfiguracja usług DI
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
 
-            // Ensure database is created
-            using (var scope = ServiceProvider.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<ParkingDbContext>();
-                dbContext.Database.EnsureCreated();
-            }
+            ServiceProvider = serviceCollection.BuildServiceProvider();
+
+            // Inicjalizacja bazy danych
+            await InitializeDatabaseAsync();
 
             // Show main window
             var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
             mainWindow.Show();
+
+            base.OnStartup(e);
+        }
+
+        private async Task InitializeDatabaseAsync() // inicjalizacja bazy danych
+        {
+            using (var scope = ServiceProvider!.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<ParkingDbContext>();
+
+                try
+                {
+                    // Zastosuj migracje
+                    await context.Database.MigrateAsync();
+
+                    // Zaseeduj dane
+                    await DataSeeder.SeedAsync(context);
+
+                    // miejsce na usuwanie, dodawanie lub modyfikowanie danych w bazie po uruchomieniu
+
+                    //context.Vehicles.Remove(await context.Vehicles.FindAsync(2));
+                    //await context.SaveChangesAsync();
+
+                    context.Vehicles.Add(new Vehicle { LicensePlate = "bbb", UserId = 1, VehicleTypeId = 1, Id=4, CreatedAt = DateTime.Now });
+                    await context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Błąd podczas inicjalizacji bazy danych: {ex.Message}", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         private void ConfigureServices(ServiceCollection services)
         {
-            // Configuration
+           
             services.AddSingleton(Configuration!);
-
-            // Database - UPROSZCZONA wersja
-            services.AddDbContext<ParkingDbContext>(options =>
+            
+            services.AddDbContext<ParkingDbContext>(options =>  // konfiguracja połączenia do bazy danych
             {
                 var connectionString = Configuration!.GetConnectionString("DefaultConnection");
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
             });
 
-            // Services
+            // Rejestracja serwisów
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IVehicleService, VehicleService>();
             services.AddScoped<IParkingService, ParkingService>();
 
-            // Validators
+            // Rejestracja walidatorów
             services.AddScoped<VehicleValidator>();
 
-            // Views
+            // Rejestracja widoków
             services.AddTransient<MainWindow>();
             services.AddTransient<LoginPage>();
             services.AddTransient<MainPage>();
@@ -71,5 +97,49 @@ namespace ParkingManagementSystem
             services.AddTransient<UnparkVehicleWindow>();
             services.AddTransient<ManageVehiclesWindow>();
         }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            if (ServiceProvider is IDisposable disposableProvider)
+            {
+                disposableProvider.Dispose();
+            }
+            base.OnExit(e);
+        }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//context.Vehicles.Remove(await context.Vehicles.FindAsync(1));
+//await context.SaveChangesAsync();
+
+//context.Vehicles.Remove(context.Vehicles.First(v => v.LicensePlate == "ABC123"));
+//await context.SaveChangesAsync();
+
+// Dodanie pojazdu (wersja skrócona)
+//context.Vehicles.Add(new Vehicle { LicensePlate = "ABC123", UserId = 1, VehicleTypeId = 1 });
+//await context.SaveChangesAsync();
+
+// Edycja pojazdu (wersja skrócona)
+//var vehicle = context.Vehicles.First(v => v.LicensePlate == "WA12345");
+//vehicle.Color = "Czarny";
+
+//await context.SaveChangesAsync();

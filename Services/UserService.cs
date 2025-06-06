@@ -31,60 +31,6 @@ namespace ParkingManagementSystem.Services
 
             return null;
         }
-
-        // public async Task<User?> GetUserByIdAsync(int userId)
-        // {
-        //     return await _context.Users
-        //         .Include(u => u.Vehicles)
-        //             .ThenInclude(v => v.VehicleType)
-        //         .FirstOrDefaultAsync(u => u.Id == userId);
-        // }
-
-        // public async Task<User?> GetUserByUsernameAsync(string username)
-        // {
-        //     return await _context.Users
-        //         .FirstOrDefaultAsync(u => u.Username == username);
-        // }
-
-        // public async Task<bool> CreateUserAsync(User user, string password)
-        // {
-        //     try
-        //     {
-        //         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
-        //         user.CreatedAt = DateTime.Now;
-
-        //         _context.Users.Add(user);
-        //         await _context.SaveChangesAsync();
-        //         return true;
-        //     }
-        //     catch
-        //     {
-        //         return false;
-        //     }
-        // }
-
-        // public async Task<bool> IsUsernameUniqueAsync(string username, int? excludeUserId = null)
-        // {
-        //     var query = _context.Users.Where(u => u.Username == username);
-
-        //     if (excludeUserId.HasValue)
-        //         query = query.Where(u => u.Id != excludeUserId.Value);
-
-        //     return !await query.AnyAsync();
-        // }
-
-        // public async Task<bool> IsEmailUniqueAsync(string email, int? excludeUserId = null)
-        // {
-        //     if (string.IsNullOrEmpty(email)) return true;
-
-        //     var query = _context.Users.Where(u => u.Email == email);
-
-        //     if (excludeUserId.HasValue)
-        //         query = query.Where(u => u.Id != excludeUserId.Value);
-
-        //     return !await query.AnyAsync();
-        // }
-
         public async Task UpdateLastLoginAsync(int userId)
         {
             var user = await _context.Users.FindAsync(userId);
